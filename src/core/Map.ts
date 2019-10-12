@@ -7,7 +7,9 @@ import * as PIXI from 'pixi.js';
 import ApiClient from '../api/ApiClient';
 import EventEmitter from './EventEmitter';
 import Renderer from './Renderer';
+
 export interface ISceneOptions {
+    root: HTMLElement,
     apiBase: string;
     apiToken?: string;
     startLocationId: number;
@@ -17,15 +19,20 @@ export default class Map extends EventEmitter implements IMap {
     get app(): PIXI.Application {
         return this._app;
     }
+
     get api(): IApiClient {
         return this._api;
     }
+
+    public root: HTMLElement;
+
     private _currentLocation: ILocation;
     private readonly _app: PIXI.Application;
     private _apiBase: string;
     private _apiToken?: string;
     private readonly _api: IApiClient;
     private readonly _renderer: IRenderer;
+
     constructor(options: ISceneOptions) {
         super();
         assignOptions(this, options);
@@ -35,6 +42,7 @@ export default class Map extends EventEmitter implements IMap {
         this._api = ApiClient.getInstance();
         // 3. initiate renderer
         this._renderer = new Renderer(this);
+        this.emit('map-ready');
         this.init(options).then(() => this.emit('map-loaded'));
     }
 
@@ -44,7 +52,7 @@ export default class Map extends EventEmitter implements IMap {
         // 4. get root location or one specified in constructor options
         let location: ILocation;
         if (options.startLocationId) {
-            location = await this._api.locations.get(options.startLocationId)
+            location = await this._api.locations.get(options.startLocationId);
         } else {
             location = await this._api.locations.getRoot();
         }

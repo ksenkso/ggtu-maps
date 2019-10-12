@@ -3,18 +3,36 @@ import {ILocation} from '../interfaces/ILocation';
 import IMap from '../interfaces/IMap';
 import IRenderer from '../interfaces/IRenderer';
 import EventEmitter from './EventEmitter';
+import {Viewport} from 'pixi-viewport';
 
 export default class Renderer extends EventEmitter implements IRenderer {
     private _app: PIXI.Application;
     private _api = ApiClient.getInstance();
-    constructor(private map: IMap) {
+    private _viewport: Viewport;
+
+    constructor(private _map: IMap) {
         super();
-        this._app = map.app;
-        this.init()
+        this._app = _map.app;
+        this.init();
     }
 
     private init() {
 
+        this._viewport = new Viewport({
+            screenWidth: this._map.root.clientWidth,
+            screenHeight: this._map.root.clientHeight,
+            worldWidth: 1000,
+            worldHeight: 1000,
+            interaction: this._app.renderer.plugins.interaction
+        });
+
+        this._app.stage.addChild(this._viewport);
+
+        this._viewport
+            .drag()
+            .pinch()
+            .wheel()
+            .decelerate();
     }
 
     public async renderLocation(location: ILocation) {

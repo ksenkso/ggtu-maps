@@ -12,7 +12,7 @@ export interface ILocationsEndpoint extends IEndpoint<ILocation> {
 
     getPathGraph(locationId: number): Promise<IAdjacencyNode[]>;
 
-    getMap(locationsId: number): Promise<any>;
+    getMap(params: GetMapParameters): Promise<any>;
 }
 
 export interface ILocation {
@@ -20,6 +20,13 @@ export interface ILocation {
     name: string;
     BuildingId: number;
     map?: string;
+}
+
+interface GetMapParameters {
+    locationId: number;
+    zoom: number;
+    x: number;
+    y: number;
 }
 
 export default class LocationsEndpoint extends BaseEndpoint implements ILocationsEndpoint {
@@ -65,9 +72,19 @@ export default class LocationsEndpoint extends BaseEndpoint implements ILocation
         }
     }
 
-    getMap(locationsId: number): Promise<any> {
-        // TODO: implement this
-        return undefined;
+    async getMap(params: GetMapParameters): Promise<any> {
+        const response = await this.api.get(this.route + params.locationId + '/map', {
+            params: {
+                zoom: params.zoom,
+                x: params.x,
+                y: params.y
+            }
+        });
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            return null;
+        }
     }
 
 }

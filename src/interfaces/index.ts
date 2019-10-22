@@ -1,12 +1,10 @@
 export {default as IAdjacencyNode} from './IAdjacencyNode';
 export {default as IApiClient} from './IApiClient';
-export {default as IDiff} from './IDiff';
 export {default as IDrawable} from './IDrawable';
 export {default as IEventEmitter} from './IEventEmitter';
 export {default as ILabelOptions} from './ILabelOptions';
-export {default as ILine} from './ILine';
 export {default as ILocation} from './ILocation';
 export {default as IMap} from './IMap';
 export {default as IMapObject} from './IMapObject';
+export {default as IPathItem} from './IPathItem';
 export {default as IRenderer} from './IRenderer';
-export {default as IScene} from './IScene';

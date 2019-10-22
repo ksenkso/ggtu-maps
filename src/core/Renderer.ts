@@ -36,6 +36,12 @@ export default class Renderer extends EventEmitter implements IRenderer {
     }
 
     public async renderLocation(location: ILocation) {
-
+        const map = await this._api.locations.getMap({
+            locationId: location.id,
+            zoom: this._viewport.scale.x,
+            x: this._viewport.center.x,
+            y: this._viewport.center.y
+        });
+        console.log(map);
     }
 }

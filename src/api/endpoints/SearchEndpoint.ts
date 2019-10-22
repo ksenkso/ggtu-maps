@@ -1,6 +1,6 @@
 import {AxiosInstance} from 'axios';
-import ApiClient from '../../core/ApiClient';
 import IPathItem from '../../interfaces/IPathItem';
+import ApiClient from '../ApiClient';
 import {IBuilding} from './BuildingsEndpoint';
 import {ILocation} from './LocationsEndpoint';
 import {IPlace} from './PlacesEndpoint';

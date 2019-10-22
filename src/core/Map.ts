@@ -5,6 +5,7 @@ import IRenderer from '../interfaces/IRenderer';
 import {assignOptions} from '../utils/common';
 import * as PIXI from 'pixi.js';
 import ApiClient from '../api/ApiClient';
+import {ICoords} from '../utils/Vector';
 import EventEmitter from './EventEmitter';
 import Renderer from './Renderer';
 
@@ -12,7 +13,7 @@ export interface ISceneOptions {
     root: HTMLElement,
     apiBase: string;
     apiToken?: string;
-    startLocationId: number;
+    startLocationId?: number;
 }
 
 export default class Map extends EventEmitter implements IMap {
@@ -69,5 +70,13 @@ export default class Map extends EventEmitter implements IMap {
 
     public getLocation(): ILocation {
         return this._currentLocation;
+    }
+
+    getCoords(): ICoords {
+        return undefined;
+    }
+
+    getZoom(): number {
+        return ;
     }
 }

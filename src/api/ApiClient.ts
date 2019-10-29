@@ -1,12 +1,13 @@
 import axios, {AxiosInstance, AxiosResponse} from 'axios';
 import * as qs from 'qs';
-import {IAuthState, IEndpoint, IUser} from './common';
 import BuildingsEndpoint, {IBuildingsEndpoint} from '../api/endpoints/BuildingsEndpoint';
 import LocationsEndpoint, {ILocationsEndpoint} from '../api/endpoints/LocationsEndpoint';
 import PlacesEndpoint, {IPlacesEndpoint} from '../api/endpoints/PlacesEndpoint';
 import SearchEndpoint, {ISearchEndpoint} from '../api/endpoints/SearchEndpoint';
 import TransitionsEndpoint, {ITransitionsEndpoint} from '../api/endpoints/TransitionsEndpoint';
 import UserInfo from '../core/UserInfo';
+import {assignOptions} from '../utils/common';
+import {IAuthState, IEndpoint, IUser} from './common';
 
 export interface ITokenInfo {
     text: string;
@@ -15,7 +16,7 @@ export interface ITokenInfo {
     user_id: number;
 }
 
-interface IApiClientParams {
+interface IApiClientOptions {
     apiBase: string;
     apiToken: string;
     user?: IUser;
@@ -34,7 +35,7 @@ export default class ApiClient {
     public static apiBase = ApiClient.base + '/v1';
     public static  mapsBase = ApiClient.base + '/maps';
 
-    public static getInstance(params: IApiClientParams) {
+    public static getInstance(params?: IApiClientOptions) {
         if (!ApiClient.instance) {
             ApiClient.instance = new ApiClient(params);
         }
@@ -50,14 +51,15 @@ export default class ApiClient {
     public readonly userInfo: UserInfo;
     private readonly api: AxiosInstance;
 
-    private constructor(params: IApiClientParams) {
+    private constructor(options: IApiClientOptions) {
+        assignOptions(this, options);
         this.api = axios.create({
             baseURL: ApiClient.apiBase,
         });
         this.api.defaults.paramsSerializer = (params: any) => qs.stringify(params, {encodeValuesOnly: true});
         this.userInfo = new UserInfo(this);
-        if (params.user) {
-            this.userInfo.user = params.user;
+        if (options.user) {
+            this.userInfo.user = options.user;
         }
         this.buildings = new BuildingsEndpoint(this.api);
         this.locations = new LocationsEndpoint(this.api);

@@ -6,5 +6,5 @@ export default interface IMap {
     api: IApiClient;
     root: HTMLElement;
     getZoom(): number;
-    getCoords(): ICoords
+    getCoords(): ICoords;
 }

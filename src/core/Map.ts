@@ -1,16 +1,16 @@
+import * as PIXI from 'pixi.js';
+import ApiClient from '../api/ApiClient';
 import IApiClient from '../interfaces/IApiClient';
 import {ILocation} from '../interfaces/ILocation';
 import IMap from '../interfaces/IMap';
 import IRenderer from '../interfaces/IRenderer';
 import {assignOptions} from '../utils/common';
-import * as PIXI from 'pixi.js';
-import ApiClient from '../api/ApiClient';
 import {ICoords} from '../utils/Vector';
 import EventEmitter from './EventEmitter';
 import Renderer from './Renderer';
 
 export interface ISceneOptions {
-    root: HTMLElement,
+    root: HTMLElement;
     apiBase: string;
     apiToken?: string;
     startLocationId?: number;
@@ -40,11 +40,33 @@ export default class Map extends EventEmitter implements IMap {
         // 1. init a PIXI app, get ready to load a location,
         this._app = new PIXI.Application();
         // 2. to do that, create an API instance.
-        this._api = ApiClient.getInstance();
+        this._api = ApiClient.getInstance({
+            apiBase: options.apiBase,
+            apiToken: options.apiToken,
+        });
         // 3. initiate renderer
         this._renderer = new Renderer(this);
         this.emit('map-ready');
         this.init(options).then(() => this.emit('map-loaded'));
+    }
+
+    public setLocation(location: ILocation) {
+        this._currentLocation = location;
+        this._renderer.renderLocation(location)
+            .then(() => this.emit('location-loaded'));
+        // when the map is rendered, fire `map-loaded`
+    }
+
+    public getLocation(): ILocation {
+        return this._currentLocation;
+    }
+
+    public getCoords(): ICoords {
+        return undefined;
+    }
+
+    public getZoom(): number {
+        return ;
     }
 
     private async init(options: ISceneOptions) {
@@ -59,24 +81,5 @@ export default class Map extends EventEmitter implements IMap {
         }
         // 5. render the location
         this.setLocation(location);
-    }
-
-    public setLocation(location: ILocation) {
-        this._currentLocation = location;
-        this._renderer.renderLocation(location)
-            .then(() => this.emit('location-loaded'));
-        // when the map is rendered, fire `map-loaded`
-    }
-
-    public getLocation(): ILocation {
-        return this._currentLocation;
-    }
-
-    getCoords(): ICoords {
-        return undefined;
-    }
-
-    getZoom(): number {
-        return ;
     }
 }

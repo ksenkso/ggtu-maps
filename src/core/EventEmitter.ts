@@ -2,10 +2,10 @@ import IEventEmitter from '../interfaces/IEventEmitter';
 import {TFunction} from '../utils/common';
 
 export default class EventEmitter implements IEventEmitter {
-    private _events = new Map<string, Array<TFunction>>();
+    private _events = new Map<string, TFunction[]>();
     public emit(event: string, payload?: any): void {
         if (this._events.has(event)) {
-            this._events.get(event).forEach(fn => fn(payload))
+            this._events.get(event).forEach((fn) => fn(payload));
         }
     }
 
@@ -19,7 +19,7 @@ export default class EventEmitter implements IEventEmitter {
 
     public on(event: string, fn: TFunction): void {
         if (this._events.has(event)) {
-            this._events.get(event).push(fn)
+            this._events.get(event).push(fn);
         } else {
             this._events.set(event, [fn]);
         }

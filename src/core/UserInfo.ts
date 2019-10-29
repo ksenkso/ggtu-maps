@@ -1,5 +1,5 @@
-import {IUser} from '../api/common';
 import ApiClient, {ITokenInfo} from '../api/ApiClient';
+import {IUser} from '../api/common';
 
 export default class UserInfo {
   set user(value: IUser) {

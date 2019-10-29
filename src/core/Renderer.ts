@@ -1,9 +1,9 @@
+import {Viewport} from 'pixi-viewport';
 import ApiClient from '../api/ApiClient';
 import {ILocation} from '../interfaces/ILocation';
 import IMap from '../interfaces/IMap';
 import IRenderer from '../interfaces/IRenderer';
 import EventEmitter from './EventEmitter';
-import {Viewport} from 'pixi-viewport';
 
 export default class Renderer extends EventEmitter implements IRenderer {
     private _app: PIXI.Application;
@@ -16,6 +16,16 @@ export default class Renderer extends EventEmitter implements IRenderer {
         this.init();
     }
 
+    public async renderLocation(location: ILocation) {
+        const map = await this._api.locations.getMap({
+            locationId: location.id,
+            zoom: this._viewport.scale.x,
+            x: this._viewport.center.x,
+            y: this._viewport.center.y,
+        });
+        console.log(map);
+    }
+
     private init() {
 
         this._viewport = new Viewport({
@@ -23,7 +33,7 @@ export default class Renderer extends EventEmitter implements IRenderer {
             screenHeight: this._map.root.clientHeight,
             worldWidth: 1000,
             worldHeight: 1000,
-            interaction: this._app.renderer.plugins.interaction
+            interaction: this._app.renderer.plugins.interaction,
         });
 
         this._app.stage.addChild(this._viewport);
@@ -33,15 +43,5 @@ export default class Renderer extends EventEmitter implements IRenderer {
             .pinch()
             .wheel()
             .decelerate();
-    }
-
-    public async renderLocation(location: ILocation) {
-        const map = await this._api.locations.getMap({
-            locationId: location.id,
-            zoom: this._viewport.scale.x,
-            x: this._viewport.center.x,
-            y: this._viewport.center.y
-        });
-        console.log(map);
     }
 }

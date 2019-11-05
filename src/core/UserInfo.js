@@ -4,7 +4,7 @@ export default class UserInfo {
   set user(value) {
     if (value) {
       this._user = value;
-      this.api.getTransport().defaults.headers.Authorization = 'Bearer ' + this._user.token;
+      this.api.token = value.token;
     }
   }
 

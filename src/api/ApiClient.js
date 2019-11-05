@@ -16,9 +16,16 @@ export default class ApiClient {
     get token() {
         return this.userInfo.user.token;
     }
+
     static base = 'http://192.168.1.68:3000';
-    static apiBase = ApiClient.base + '/v1';
-    static mapsBase = ApiClient.base + '/maps';
+
+    static get apiBase() {
+        return ApiClient.base + '/v1';
+    }
+
+    static get mapsBase() {
+        return ApiClient.base + '/maps';
+    }
 
     static getInstance(params) {
         if (!ApiClient.instance) {
@@ -27,7 +34,10 @@ export default class ApiClient {
         return ApiClient.instance;
     }
 
-    constructor(params) {
+    constructor(params = {}) {
+        if (params.base) {
+            ApiClient.base = params.base;
+        }
         /**
          *
          * @type {AxiosInstance}
@@ -40,10 +50,30 @@ export default class ApiClient {
         if (params.user) {
             this.userInfo.user = params.user;
         }
+        /**
+         *
+         * @type {BuildingsEndpoint}
+         */
         this.buildings = new BuildingsEndpoint(this.api);
+        /**
+         *
+         * @type {LocationsEndpoint}
+         */
         this.locations = new LocationsEndpoint(this.api);
+        /**
+         *
+         * @type {PlacesEndpoint}
+         */
         this.places = new PlacesEndpoint(this.api);
+        /**
+         *
+         * @type {TransitionsEndpoint}
+         */
         this.transitions = new TransitionsEndpoint(this.api);
+        /**
+         *
+         * @type {SearchEndpoint}
+         */
         this.search = new SearchEndpoint(this.api);
     }
 
@@ -88,10 +118,14 @@ export default class ApiClient {
 
     getEndpointByType(type) {
         switch (type) {
-            case 'place': return this.places;
-            case 'building': return this.buildings;
-            case 'transition': return this.transitions;
-            case 'transition-view': return this.transitions.views;
+            case 'place':
+                return this.places;
+            case 'building':
+                return this.buildings;
+            case 'transition':
+                return this.transitions;
+            case 'transition-view':
+                return this.transitions.views;
         }
         return null;
     }

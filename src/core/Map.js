@@ -5,21 +5,19 @@ import EventEmitter from './EventEmitter';
 import Renderer from './Renderer';
 
 export default class Map extends EventEmitter {
-    get app() {
-        return this._app;
-    }
 
-    get api() {
-        return this._api;
-    }
-
-    constructor(options) {
+    /**
+     *
+     * @param {object} options
+     */
+    constructor(options = {}) {
         super();
         assignOptions(this, options);
         // 1. init a PIXI app, get ready to load a location,
-        this._app = new PIXI.Application();
+        this.app = new PIXI.Application(options.app || {});
+        this.root.appendChild(this.app.view);
         // 2. to do that, create an API instance.
-        this._api = ApiClient.getInstance();
+        this.api = ApiClient.getInstance(options.api ? options.api : {});
         // 3. initiate renderer
         this._renderer = new Renderer(this);
         this.emit('map-ready');
@@ -32,9 +30,9 @@ export default class Map extends EventEmitter {
         // 4. get root location or one specified in constructor options
         let location;
         if (options.startLocationId) {
-            location = await this._api.locations.get(options.startLocationId);
+            location = await this.api.locations.get(options.startLocationId);
         } else {
-            location = await this._api.locations.getRoot();
+            location = await this.api.locations.getRoot();
         }
         // 5. render the location
         this.setLocation(location);
@@ -43,8 +41,15 @@ export default class Map extends EventEmitter {
     setLocation(location) {
         this._currentLocation = location;
         this._renderer.renderLocation(location)
-            .then(() => this.emit('location-loaded'));
-        // when the map is rendered, fire `map-loaded`
+    }
+
+    /**
+     *
+     * @param {number} locationId
+     */
+    setLocationById(locationId) {
+        this.api.locations.get(locationId)
+            .then(location => this.setLocation(location));
     }
 
     getLocation() {

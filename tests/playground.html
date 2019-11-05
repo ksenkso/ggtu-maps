@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="map"></div>
+<script src="../dist/bundle.js"></script>
+<script>
+    const map = new ggtuMap.Map({
+        root: document.getElementById('map'),
+        startLocationId: 4,
+        api: {
+            base: 'http://localhost:3000'
+        },
+        app: {
+            height: 1024,
+            width: 1024
+        }
+    });
+    window._map = map;
+</script>
+</body>
+</html>

@@ -29,8 +29,8 @@ export default class Renderer extends EventEmitter {
         this._viewport.sortableChildren = true;
         this._viewport.on('zoomed-end', this.onZoomEnd.bind(this));
         this.app.stage.addChild(this._viewport);
-        this.sprites = [new Sprite(), new Sprite(), new Sprite(), new Sprite()];
-        this.placeSprites();
+        this.sprites = [new Sprite(), new Sprite(), new Sprite(), new Sprite(), ...Array(16 + 64).fill(null)];
+        this.placeSprites(0, 2);
 
         this._viewport
             .drag()
@@ -44,10 +44,15 @@ export default class Renderer extends EventEmitter {
         this.zoomLevel = this.getZoomLevel();
     }
 
-    placeSprites() {
-        const matrixWidth = this.getMatrixWidth();
-        for (let i = 0; i < matrixWidth**2; i++) {
-            this.sprites[i].position.set((i % matrixWidth) * this.tileSize, (i / matrixWidth | 0) * this.tileSize);
+    /**
+     *
+     * @param {number} startIndex
+     * @param {number} matrixWidth
+     */
+    placeSprites(startIndex, matrixWidth) {
+        const end = matrixWidth ** 2;
+        for (let i = 0; i < end; i++) {
+            this.sprites[i + startIndex].position.set((i % matrixWidth) * this.tileSize, (i / matrixWidth | 0) * this.tileSize);
         }
     }
 
@@ -55,25 +60,26 @@ export default class Renderer extends EventEmitter {
         const newZoomLevel = this.getZoomLevel();
         const diff = newZoomLevel - this.zoomLevel;
         this.zoomLevel = newZoomLevel;
-        this.tileSize = 256 / newZoomLevel;
-        if (diff === 1) {
+        this.tileSize = 256 / (2 ** (newZoomLevel - 1));
+        if (diff !== 0) {
             // zoom level has changed, now its 2
             // load 16 sprites and render them
-            const sprites = Array(16).fill(null).map(() => {
-                const s = new Sprite();
-                s.scale.set(0.5, 0.5);
-                s.alpha = 0;
-                return s;
-            });
-            this.sprites.splice(0, 0, ...sprites);
-            this.placeSprites(sprites);
+            const matrixWidth = this.getMatrixWidth();
+            const matrixSize = matrixWidth ** 2;
+            const startIndex = this.getFirstSpriteIndex();
+            if (!this.sprites[startIndex]) {
+                const scale = 1 / (2 ** (newZoomLevel - 1));
+                const sprites = Array(matrixSize).fill(null).map(() => {
+                    const s = new Sprite();
+                    s.scale.set(scale, scale);
+                    s.alpha = 0;
+                    return s;
+                });
+                this.sprites.splice(startIndex, matrixSize, ...sprites);
+                this.placeSprites(startIndex, matrixWidth);
+            }
             this.renderLocation(this.location);
-        } else if (diff === -1) {
-            // zoom level has changed, now its 1
-            // load 4 sprites
-
         }
-        // update zoom level
     }
 
     onMainQueueLoaded() {
@@ -126,7 +132,7 @@ export default class Renderer extends EventEmitter {
      * @param {number} y
      */
     renderTile(tile, x, y) {
-        const index = y * this.getMatrixWidth() + x;
+        const index = this.getFirstSpriteIndex() + y * this.getMatrixWidth() + x;
         const sprite = this.sprites[index];
         sprite.texture = tile.texture;
         sprite.alpha = 1;
@@ -189,6 +195,7 @@ export default class Renderer extends EventEmitter {
         markup.forEach(tile => {
             const name = `${locationId}/${zoom}/${tile.col}_${tile.row}`;
             if (tile.viewport) {
+                console.log(name);
                 this.addToLoader(name);
             } else {
                 this.secondaryLoadingQueue.add(name);
@@ -202,15 +209,15 @@ export default class Renderer extends EventEmitter {
      * @return {number}
      */
     getZoomLevel() {
-        return this._viewport.scale.x >= 2 ? 2 : 1;
+        return Math.min(Math.round(this._viewport.scale.x) || 1, 3);
     }
 
     /**
-     *
+     * @param {number} [zoomLevel]
      * @return {number}
      */
-    getMatrixWidth() {
-        return this.zoomLevel === 2 ? 4 : 2;
+    getMatrixWidth(zoomLevel) {
+        return 2 ** (zoomLevel || this.zoomLevel);
     }
 
     /**
@@ -223,5 +230,10 @@ export default class Renderer extends EventEmitter {
             x: (tile.col - 0.5) * this.tileSize,
             y: (tile.row - 0.5) * this.tileSize
         };
+    }
+
+    getFirstSpriteIndex(zoomLevel) {
+        const zoom = zoomLevel || this.zoomLevel;
+        return zoom === 1 ? 0 : zoom === 2 ? 4 : 20;
     }
 }

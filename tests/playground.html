@@ -3,20 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+        }
+
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
 </head>
 <body>
 <div id="map"></div>
 <script src="../dist/bundle.js"></script>
 <script>
+    const root = document.getElementById('map');
     const map = new ggtuMap.Map({
-        root: document.getElementById('map'),
+        root,
         startLocationId: 4,
         api: {
             base: 'http://localhost:3000'
         },
         app: {
-            height: 512,
-            width: 512
+            width: root.clientWidth,
+            height: root.clientHeight
         }
     });
     window._map = map;

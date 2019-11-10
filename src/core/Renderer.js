@@ -41,7 +41,20 @@ export default class Renderer extends EventEmitter {
                 maxWidth: this.app.view.width,
                 maxHeight: this.app.view.height
             });
+        // cover the canvas
+        const {width, height} = this.app.view;
+        if (width >= height) {
+            if (width >= this._viewport.worldWidth) {
+                this._viewport.zoomPercent(width / this._viewport.worldWidth)
+            }
+        } else {
+            if (height >= this._viewport.worldHeight) {
+                this._viewport.zoomPercent(height / this._viewport.worldHeight)
+            }
+        }
         this.zoomLevel = this.getZoomLevel();
+        this.fillSpritesForZoomLevel(this.zoomLevel);
+        this.hideIrrelevantSprites(this.zoomLevel);
     }
 
     /**
@@ -60,25 +73,35 @@ export default class Renderer extends EventEmitter {
         const newZoomLevel = this.getZoomLevel();
         const diff = newZoomLevel - this.zoomLevel;
         this.zoomLevel = newZoomLevel;
-        this.tileSize = 256 / (2 ** (newZoomLevel - 1));
+
         if (diff !== 0) {
             // zoom level has changed, now its 2
             // load 16 sprites and render them
+            this.fillSpritesForZoomLevel(newZoomLevel);
+            this.hideIrrelevantSprites(newZoomLevel);
+            this.renderLocation(this.location);
+        }
+    }
+
+    /**
+     *
+     * @param {number} newZoomLevel
+     */
+    fillSpritesForZoomLevel(newZoomLevel) {
+        const startIndex = this.getFirstSpriteIndex();
+        if (!this.sprites[startIndex]) {
+            this.tileSize = 256 / (2 ** (newZoomLevel - 1));
             const matrixWidth = this.getMatrixWidth();
             const matrixSize = matrixWidth ** 2;
-            const startIndex = this.getFirstSpriteIndex();
-            if (!this.sprites[startIndex]) {
-                const scale = 1 / (2 ** (newZoomLevel - 1));
-                const sprites = Array(matrixSize).fill(null).map(() => {
-                    const s = new Sprite();
-                    s.scale.set(scale, scale);
-                    s.alpha = 0;
-                    return s;
-                });
-                this.sprites.splice(startIndex, matrixSize, ...sprites);
-                this.placeSprites(startIndex, matrixWidth);
-            }
-            this.renderLocation(this.location);
+            const scale = 1 / (2 ** (newZoomLevel - 1));
+            const sprites = Array(matrixSize).fill(null).map(() => {
+                const s = new Sprite();
+                s.scale.set(scale, scale);
+                s.alpha = 0;
+                return s;
+            });
+            this.sprites.splice(startIndex, matrixSize, ...sprites);
+            this.placeSprites(startIndex, matrixWidth);
         }
     }
 
@@ -106,6 +129,8 @@ export default class Renderer extends EventEmitter {
                     `${ApiClient.mapsBase}/${name}.jpeg`
                 );
                 this.mainLoadingQueue.add(name);
+            } else {
+                this.onTileLoaded(this.mapLoader, this.mapLoader.resources[name])
             }
         }
     }
@@ -117,7 +142,9 @@ export default class Renderer extends EventEmitter {
      * @param {PIXI.LoaderResource} resource
      */
     onTileLoaded(loader, resource) {
-        this.mainLoadingQueue.delete(resource.name);
+        if (this.mainLoadingQueue.has(resource.name)) {
+            this.mainLoadingQueue.delete(resource.name);
+        }
         // render the tile
         const match = resource.name.match(/\d\/\d\/(\d)_(\d)/);
         const x = +match[1];
@@ -235,5 +262,25 @@ export default class Renderer extends EventEmitter {
     getFirstSpriteIndex(zoomLevel) {
         const zoom = zoomLevel || this.zoomLevel;
         return zoom === 1 ? 0 : zoom === 2 ? 4 : 20;
+    }
+
+    /**
+     *
+     * @param {number} newZoomLevel
+     */
+    hideIrrelevantSprites(newZoomLevel) {
+        const matrixWidth = this.getMatrixWidth(newZoomLevel);
+        const startIndex = this.getFirstSpriteIndex(newZoomLevel);
+        const end = matrixWidth ** 2;
+        for (let i = 0; i < startIndex; i++) {
+            if (this.sprites[i]) {
+                this.sprites[i].alpha = 0;
+            }
+        }
+        for (let i = startIndex + end; i < this.sprites.length; i++) {
+            if (this.sprites[i]) {
+                this.sprites[i].alpha = 0;
+            }
+        }
     }
 }

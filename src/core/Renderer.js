@@ -3,6 +3,8 @@ import EventEmitter from './EventEmitter';
 import {Viewport} from 'pixi-viewport';
 import {Loader, Sprite} from 'pixi.js';
 
+const WORLD_SIZE = 512;
+
 export default class Renderer extends EventEmitter {
 
     constructor(map) {
@@ -22,8 +24,8 @@ export default class Renderer extends EventEmitter {
         this._viewport = new Viewport({
             screenWidth: this.app.view.width,
             screenHeight: this.app.view.height,
-            worldWidth: 512,
-            worldHeight: 512,
+            worldWidth: WORLD_SIZE,
+            worldHeight: WORLD_SIZE,
             interaction: this.app.renderer.plugins.interaction
         });
         this._viewport.sortableChildren = true;
@@ -38,20 +40,9 @@ export default class Renderer extends EventEmitter {
             .wheel()
             .clamp({direction: 'all'})
             .clampZoom({
-                maxWidth: this.app.view.width,
-                maxHeight: this.app.view.height
+                maxWidth: WORLD_SIZE ** 2 / this.app.view.width,
+                maxHeight: WORLD_SIZE ** 2 / this.app.view.height
             });
-        // cover the canvas
-        const {width, height} = this.app.view;
-        if (width >= height) {
-            if (width >= this._viewport.worldWidth) {
-                this._viewport.zoomPercent(width / this._viewport.worldWidth)
-            }
-        } else {
-            if (height >= this._viewport.worldHeight) {
-                this._viewport.zoomPercent(height / this._viewport.worldHeight)
-            }
-        }
         this.zoomLevel = this.getZoomLevel();
         this.fillSpritesForZoomLevel(this.zoomLevel);
         this.hideIrrelevantSprites(this.zoomLevel);

@@ -1,6 +1,10 @@
 import ApiClient from '../api/ApiClient';
 
 export default class UserInfo {
+  /**
+   *
+   * @param {User} value
+   */
   set user(value) {
     if (value) {
       this._user = value;
@@ -8,6 +12,10 @@ export default class UserInfo {
     }
   }
 
+  /**
+   *
+   * @return {User}
+   */
   get user() {
     return this._user;
   }
@@ -20,6 +28,10 @@ export default class UserInfo {
     this.api = api;
   }
 
+  /**
+   *
+   * @return {Promise<null|{user_id: number, iat: number, exp: number, text: string}>}
+   */
   async getTokenInfo() {
 
     const api = this.api.getTransport();

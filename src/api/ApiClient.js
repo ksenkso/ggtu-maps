@@ -8,25 +8,45 @@ import TransitionsEndpoint from '../api/endpoints/TransitionsEndpoint';
 import UserInfo from '../core/UserInfo';
 
 export default class ApiClient {
-
+    /**
+     *
+     * @param {string} token
+     */
     set token(token) {
         this.api.defaults.headers.Authorization = token ? `Bearer ${token}` : '';
     }
 
+    /**
+     *
+     * @return {*|CancelToken}
+     */
     get token() {
         return this.userInfo.user.token;
     }
 
     static base = 'http://192.168.1.68:3000';
 
+    /**
+     *
+     * @return {string}
+     */
     static get apiBase() {
         return ApiClient.base + '/v1';
     }
 
+    /**
+     *
+     * @return {string}
+     */
     static get mapsBase() {
         return ApiClient.base + '/maps';
     }
 
+    /**
+     *
+     * @param params
+     * @return {ApiClient}
+     */
     static getInstance(params) {
         if (!ApiClient.instance) {
             ApiClient.instance = new ApiClient(params);
@@ -34,6 +54,10 @@ export default class ApiClient {
         return ApiClient.instance;
     }
 
+    /**
+     *
+     * @param {{base: string, user?: {token: string}}} params
+     */
     constructor(params = {}) {
         if (params.base) {
             ApiClient.base = params.base;
@@ -104,6 +128,7 @@ export default class ApiClient {
     /**
      *
      * @throws Error
+     * @return {boolean}
      */
     async checkToken(token) {
         const response = await this.api.get('auth', {params: {token}});
@@ -116,6 +141,11 @@ export default class ApiClient {
         }
     }
 
+    /**
+     *
+     * @param {string} type
+     * @return {TransitionViewsEndpoint|TransitionsEndpoint|null|PlacesEndpoint|BuildingsEndpoint}
+     */
     getEndpointByType(type) {
         switch (type) {
             case 'place':

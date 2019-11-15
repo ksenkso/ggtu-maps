@@ -1,3 +1,5 @@
+/**
+ */
 import BaseEndpoint from '../common';
 
 export default class PlacesEndpoint extends BaseEndpoint {

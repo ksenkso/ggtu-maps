@@ -112,13 +112,14 @@ export default class ApiClient {
     /**
      *
      * @throws Error
+     * @return {User|null}
      */
     async authenticate(login, password) {
         const response = await this.api.post('login', {login, password});
         if (response) {
             this.api.defaults.headers.Authorization = `Bearer ${response.data.token}`;
             this.token = response.data.token;
-            this.userInfo.user = response.data;
+            this.userInfo.user = /**@type User} */response.data;
             return response.data;
         } else {
             return null;

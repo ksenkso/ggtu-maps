@@ -2,6 +2,11 @@ import ApiClient from '../ApiClient';
 
 export default class SearchEndpoint {
     route = '/search';
+
+    /**
+     *
+     * @param {AxiosInstance} api
+     */
     constructor(api) {
         this.api = api;
     }

@@ -6,7 +6,7 @@ module.exports = {
         path: path.join(__dirname, 'dist'),
         filename: 'bundle.js',
         library: 'ggtuMap',
-        // libraryTarget: 'umd'
+        libraryTarget: 'umd'
     },
     devServer: {
         contentBase: './public',

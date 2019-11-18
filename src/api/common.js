@@ -1,7 +1,7 @@
 export default class BaseEndpoint {
     /**
      *
-     * @param {ApiClient} api
+     * @param {AxiosInstance} api
      */
     constructor(api) {
         this.api = api;

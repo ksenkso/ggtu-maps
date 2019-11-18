@@ -56,7 +56,7 @@ export default class ApiClient {
 
     /**
      *
-     * @param {{base: string, user?: {token: string}}} params
+     * @param {{base: string, user?: User}} params
      */
     constructor(params = {}) {
         if (params.base) {
@@ -109,38 +109,7 @@ export default class ApiClient {
         return this.api;
     }
 
-    /**
-     *
-     * @throws Error
-     * @return {User|null}
-     */
-    async authenticate(login, password) {
-        const response = await this.api.post('login', {login, password});
-        if (response) {
-            this.api.defaults.headers.Authorization = `Bearer ${response.data.token}`;
-            this.token = response.data.token;
-            this.userInfo.user = /**@type User} */response.data;
-            return response.data;
-        } else {
-            return null;
-        }
-    }
 
-    /**
-     *
-     * @throws Error
-     * @return {boolean}
-     */
-    async checkToken(token) {
-        const response = await this.api.get('auth', {params: {token}});
-        if (response && response.data.ok) {
-            this.token = token;
-            const user = this.userInfo.user;
-            user.token = token;
-            this.userInfo.user = user;
-            return true;
-        }
-    }
 
     /**
      *

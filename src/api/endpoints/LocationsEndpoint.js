@@ -5,7 +5,7 @@ export default class LocationsEndpoint extends BaseEndpoint {
 
     /**
      *
-     * @param {ApiClient} api
+     * @param {AxiosInstance} api
      */
     constructor(api) {
         super(api);

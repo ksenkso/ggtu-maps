@@ -6,7 +6,7 @@ export default class BuildingsEndpoint extends BaseEndpoint {
 
   /**
    *
-   * @param {ApiClient} api
+   * @param {AxiosInstance} api
    */
   constructor(api) {
     super(api);
@@ -20,7 +20,7 @@ export default class BuildingsEndpoint extends BaseEndpoint {
   async getLocations(id) {
     const response = await this.api.get(this.route + id + '/floors');
     if (response.status === 200) {
-      return response.data;
+      return /**@type {Location[]} */response.data;
     } else {
       return null;
     }

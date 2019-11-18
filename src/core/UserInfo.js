@@ -37,10 +37,28 @@ export default class UserInfo {
 
   /**
    *
+   * @throws Error
+   * @param {{login: string, password: string}} user
+   * @return {Promise<User>}
+   */
+  async login(user) {
+    const data = await this.auth.authenticate(user.login, user.password);
+    this.user = data;
+    return data;
+  }
+
+  /**
+   *
    * @return {Promise<boolean>}
    */
   async isLoggedIn() {
-    return this.user.token && await this.auth.checkToken(this.user.token);
+    if (this.user.token) {
+     try {
+       return await this.auth.checkToken(this.user.token);
+     } catch (e) {
+       return false;
+     }
+    }
   }
 
   logout() {

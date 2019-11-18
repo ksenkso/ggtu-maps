@@ -1,10 +1,12 @@
 const path = require('path');
 module.exports = {
     mode: 'development',
-    entry: './src/index.ts',
+    entry: './src/index.js',
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: 'bundle.js'
+        filename: 'bundle.js',
+        library: 'ggtuMap',
+        // libraryTarget: 'umd'
     },
     devServer: {
         contentBase: './public',
@@ -14,13 +16,13 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts$/,
-                loader: 'ts-loader',
+                test: /\.js$/,
+                loader: 'babel-loader',
                 exclude: /node_modules/
             }
         ]
     },
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.js'],
     }
 };

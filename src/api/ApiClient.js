@@ -70,7 +70,7 @@ export default class ApiClient {
             baseURL: ApiClient.apiBase,
         });
         this.api.defaults.paramsSerializer = (params) => qs.stringify(params, {encodeValuesOnly: true});
-        this.userInfo = new UserInfo(this.api);
+        this.userInfo = new UserInfo(this);
         if (params.user) {
             this.userInfo.user = params.user;
         }

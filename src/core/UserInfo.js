@@ -10,7 +10,6 @@ export default class UserInfo {
     if (value) {
       this._user = value;
       this.api.token = value.token;
-
     }
   }
 
@@ -28,11 +27,11 @@ export default class UserInfo {
 
   /**
    *
-   * @param {AxiosInstance} api
+   * @param {ApiClient} api
    */
   constructor(api) {
     this.api = api;
-    this.auth = new AuthEndpoint(this.api);
+    this.auth = new AuthEndpoint(this.api.getTransport());
   }
 
   /**

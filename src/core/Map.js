@@ -1,3 +1,25 @@
+/**
+ * @typedef {{
+            autoStart?: boolean,
+            width?: number,
+            height?: number,
+            view?: HTMLCanvasElement,
+            transparent?: boolean,
+            autoDensity?: boolean,
+            antialias?: boolean,
+            preserveDrawingBuffer?: boolean,
+            resolution?: number,
+            forceCanvas?: boolean,
+            backgroundColor?: number,
+            clearBeforeRender?: boolean,
+            forceFXAA?: boolean,
+            powerPreference?: string,
+            sharedTicker?: boolean,
+            sharedLoader?: boolean,
+            resizeTo?: Window | HTMLElement
+        }} PIXIOptions
+ * @typedef {{root: HTMLElement, startLocationId: number, app: PIXIOptions, api: ApiClientOptions}} MapOptions
+ */
 import {assignOptions} from '../utils/common';
 import * as PIXI from 'pixi.js';
 import ApiClient from '../api/ApiClient';
@@ -8,7 +30,7 @@ export default class Map extends EventEmitter {
 
     /**
      *
-     * @param {object} options
+     * @param {MapOptions} options
      */
     constructor(options = {}) {
         super();

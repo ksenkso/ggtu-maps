@@ -7,6 +7,9 @@ import SearchEndpoint from '../api/endpoints/SearchEndpoint';
 import TransitionsEndpoint from '../api/endpoints/TransitionsEndpoint';
 import UserInfo from '../core/UserInfo';
 
+/**
+ * @typedef {{base: string, user?: User}} ApiClientOptions
+ */
 export default class ApiClient {
     /**
      *
@@ -56,11 +59,11 @@ export default class ApiClient {
 
     /**
      *
-     * @param {{base: string, user?: User}} params
+     * @param {ApiClientOptions} options
      */
-    constructor(params = {}) {
-        if (params.base) {
-            ApiClient.base = params.base;
+    constructor(options = {}) {
+        if (options.base) {
+            ApiClient.base = options.base;
         }
         /**
          *
@@ -71,8 +74,8 @@ export default class ApiClient {
         });
         this.api.defaults.paramsSerializer = (params) => qs.stringify(params, {encodeValuesOnly: true});
         this.userInfo = new UserInfo(this);
-        if (params.user) {
-            this.userInfo.user = params.user;
+        if (options.user) {
+            this.userInfo.user = options.user;
         }
         /**
          *

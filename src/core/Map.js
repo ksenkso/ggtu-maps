@@ -18,7 +18,13 @@
             sharedLoader?: boolean,
             resizeTo?: Window | HTMLElement
         }} PIXIOptions
- * @typedef {{root: HTMLElement, startLocationId?: number, app?: PIXIOptions, api?: ApiClientOptions & {instance: ApiClient}}} MapOptions
+ * @typedef {{
+ * root: HTMLElement,
+ * startLocationId?: number,
+ * app?: PIXIOptions,
+ * api?: ApiClientOptions & {instance: ApiClient},
+ * renderer: RendererOptions
+ * }} MapOptions
  */
 import * as PIXI from 'pixi.js';
 import ApiClient from '../api/ApiClient';
@@ -48,7 +54,8 @@ export default class Map extends EventEmitter {
             this.api = ApiClient.getInstance(options.api ? options.api : {});
         }
         // 3. initiate renderer
-        this._renderer = new Renderer({map: this});
+        options.renderer = Object.assign({}, options.renderer, {map: this});
+        this._renderer = new Renderer(options.renderer);
         this.emit('map-ready');
         this.init(options).then(() => this.emit('map-loaded'), this.getLocation());
     }

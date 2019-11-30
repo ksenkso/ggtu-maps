@@ -48,7 +48,7 @@ export default class Map extends EventEmitter {
             this.api = ApiClient.getInstance(options.api ? options.api : {});
         }
         // 3. initiate renderer
-        this._renderer = new Renderer(this);
+        this._renderer = new Renderer({map: this});
         this.emit('map-ready');
         this.init(options).then(() => this.emit('map-loaded'), this.getLocation());
     }

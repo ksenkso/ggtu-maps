@@ -1,3 +1,13 @@
+/**
+ * @typedef {{
+ * map: Map,
+ * clamp?: ClampOptions,
+ * drag?: DragOptions,
+ * clampZoom?: ClampZoomOptions,
+ * wheel?: WheelOptions,
+ * pinch?: PinchOption
+ * }} RendererOptions
+ */
 import ApiClient from '../api/ApiClient';
 import EventEmitter from './EventEmitter';
 import {Viewport} from 'pixi-viewport';
@@ -6,14 +16,21 @@ import {Loader, Sprite} from 'pixi.js';
 const WORLD_SIZE = 512;
 
 export default class Renderer extends EventEmitter {
-
-    constructor(map) {
+    /**
+     *
+     * @param {RendererOptions} options
+     */
+    constructor(options) {
         super();
-        this.app = map.app;
-        this.init();
+        this.app = options.map.app;
+        this.init(options);
     }
 
-    init() {
+    /**
+     *
+     * @param {RendererOptions} options
+     */
+    init(options) {
         this.tileSize = 256;
         this.location = null;
         this.mainLoadingQueue = new Set();
@@ -33,16 +50,21 @@ export default class Renderer extends EventEmitter {
         this.app.stage.addChild(this._viewport);
         this.sprites = [new Sprite(), new Sprite(), new Sprite(), new Sprite(), ...Array(16 + 64).fill(null)];
         this.placeSprites(0, 2);
-
+        // set default values
+        options.clamp = options.clamp ? options.clamp : {
+            directions: 'all'
+        };
+        options.clampZoom = options.clampZoom ? options.clampZoom : {
+            maxWidth: WORLD_SIZE ** 2 / this.app.view.width,
+            maxHeight: WORLD_SIZE ** 2 / this.app.view.height
+        };
+        console.log(options);
         this._viewport
-            .drag()
-            .pinch()
-            .wheel()
-            .clamp({direction: 'all'})
-            .clampZoom({
-                maxWidth: WORLD_SIZE ** 2 / this.app.view.width,
-                maxHeight: WORLD_SIZE ** 2 / this.app.view.height
-            });
+            .drag(options.drag)
+            .pinch(options.pinch)
+            .wheel(options.wheel)
+            .clamp(options.clamp)
+            .clampZoom(options.clampZoom);
         this.zoomLevel = this.getZoomLevel();
         this.fillSpritesForZoomLevel(this.zoomLevel);
         this.hideIrrelevantSprites(this.zoomLevel);

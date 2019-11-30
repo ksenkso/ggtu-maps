@@ -7,11 +7,23 @@
         html, body {
             padding: 0;
             margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            display: grid;
+            grid-template-columns: auto;
+            grid-template-rows: auto;
+            grid-template-areas: "map";
+
         }
 
         #map {
-            width: 100vw;
-            height: 100vh;
+            grid-area: map;
+        }
+        #map canvas {
+            display: block;
         }
     </style>
 </head>
@@ -22,9 +34,11 @@
     const root = document.getElementById('map');
     const map = new ggtuMap.Map({
         root,
-        startLocationId: 4,
         api: {
-            base: 'http://localhost:3000'
+            base: 'http://localhost:3000',
+            user: {
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE1NzQyNzExOTksImV4cCI6MTU3NDM1NzU5OX0.12WwPasOALW0TRBfmPhCt8l-QCbpaN7meJdS6VcEWic'
+            }
         },
         app: {
             width: root.clientWidth,

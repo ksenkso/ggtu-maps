@@ -51,20 +51,28 @@ export default class Renderer extends EventEmitter {
         this.sprites = [new Sprite(), new Sprite(), new Sprite(), new Sprite(), ...Array(16 + 64).fill(null)];
         this.placeSprites(0, 2);
         // set default values
-        options.clamp = options.clamp ? options.clamp : {
-            directions: 'all'
+        options.clamp = options.clamp !== undefined ? options.clamp : {
+            direction: 'all'
         };
-        options.clampZoom = options.clampZoom ? options.clampZoom : {
+        options.clampZoom = options.clampZoom !== undefined ? options.clampZoom : {
             maxWidth: WORLD_SIZE ** 2 / this.app.view.width,
             maxHeight: WORLD_SIZE ** 2 / this.app.view.height
         };
         console.log(options);
-        this._viewport
-            .drag(options.drag)
-            .pinch(options.pinch)
-            .wheel(options.wheel)
-            .clamp(options.clamp)
-            .clampZoom(options.clampZoom);
+        for (const feature of ['drag', 'pinch', 'wheel', 'clamp', 'clampZoom']) {
+            console.log(feature);
+            if (options[feature] !== undefined) {
+                this._viewport[feature](options[feature])
+            } else {
+                this._viewport[feature]();
+            }
+        }
+        // this._viewport
+        //     .drag(options.drag)
+        //     .pinch(options.pinch)
+        //     .wheel(options.wheel)
+        //     .clamp(options.clamp)
+        //     .clampZoom(options.clampZoom);
         this.zoomLevel = this.getZoomLevel();
         this.fillSpritesForZoomLevel(this.zoomLevel);
         this.hideIrrelevantSprites(this.zoomLevel);
@@ -88,10 +96,9 @@ export default class Renderer extends EventEmitter {
         this.zoomLevel = newZoomLevel;
 
         if (diff !== 0) {
-            // zoom level has changed, now its 2
+            // zoom level has changed
             // load 16 sprites and render them
             this.fillSpritesForZoomLevel(newZoomLevel);
-            this.hideIrrelevantSprites(newZoomLevel);
             this.renderLocation(this.location);
         }
     }
@@ -124,6 +131,8 @@ export default class Renderer extends EventEmitter {
                 this.addToLoader(name);
                 this.secondaryLoadingQueue.delete(name);
             })
+        } else {
+            this.hideIrrelevantSprites(this.zoomLevel);
         }
     }
 

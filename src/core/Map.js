@@ -18,9 +18,8 @@
             sharedLoader?: boolean,
             resizeTo?: Window | HTMLElement
         }} PIXIOptions
- * @typedef {{root: HTMLElement, startLocationId: number, app: PIXIOptions, api: ApiClientOptions}} MapOptions
+ * @typedef {{root: HTMLElement, startLocationId?: number, app?: PIXIOptions, api?: ApiClientOptions & {instance: ApiClient}}} MapOptions
  */
-import {assignOptions} from '../utils/common';
 import * as PIXI from 'pixi.js';
 import ApiClient from '../api/ApiClient';
 import EventEmitter from './EventEmitter';
@@ -28,22 +27,30 @@ import Renderer from './Renderer';
 
 export default class Map extends EventEmitter {
 
+    get isLoading() {
+        return this._isLoadingStartLocation || this._renderer.mapLoader.loading;
+    }
+
     /**
      *
      * @param {MapOptions} options
      */
     constructor(options = {}) {
         super();
-        assignOptions(this, options);
+        this.root = options.root;
         // 1. init a PIXI app, get ready to load a location,
         this.app = new PIXI.Application(options.app || {});
         this.root.appendChild(this.app.view);
-        // 2. to do that, create an API instance.
-        this.api = ApiClient.getInstance(options.api ? options.api : {});
+        // 2. to do that, create an API instance or take it from options
+        if (options.api.instance) {
+            this.api = options.api.instance;
+        } else {
+            this.api = ApiClient.getInstance(options.api ? options.api : {});
+        }
         // 3. initiate renderer
         this._renderer = new Renderer(this);
         this.emit('map-ready');
-        this.init(options).then(() => this.emit('map-loaded'));
+        this.init(options).then(() => this.emit('map-loaded'), this.getLocation());
     }
 
     async init(options) {
@@ -51,17 +58,20 @@ export default class Map extends EventEmitter {
         // now the map is ready to render things. fire `map-ready` event
         // 4. get root location or one specified in constructor options
         let location;
+        this._isLoadingStartLocation = true;
         if (options.startLocationId) {
             location = await this.api.locations.get(options.startLocationId);
         } else {
             location = await this.api.locations.getRoot();
         }
+        this._isLoadingStartLocation = false;
         // 5. render the location
         this.setLocation(location);
     }
 
     setLocation(location) {
         this._currentLocation = location;
+        this.emit('location-change', location);
         this._renderer.renderLocation(location)
     }
 

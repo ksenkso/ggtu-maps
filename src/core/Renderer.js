@@ -55,15 +55,16 @@ export default class Renderer extends EventEmitter {
             direction: 'all'
         };
         options.clampZoom = options.clampZoom !== undefined ? options.clampZoom : {
-            maxWidth: WORLD_SIZE ** 2 / this.app.view.width,
-            maxHeight: WORLD_SIZE ** 2 / this.app.view.height
+            maxWidth: WORLD_SIZE,
+            maxHeight: WORLD_SIZE
         };
         console.log(options);
         for (const feature of ['drag', 'pinch', 'wheel', 'clamp', 'clampZoom']) {
-            console.log(feature);
-            if (options[feature] !== undefined) {
+            if (options[feature]) {
+                console.log(`${feature} with options: ${JSON.stringify(options[feature])}`);
                 this._viewport[feature](options[feature])
             } else {
+                console.log(`${feature} without options`);
                 this._viewport[feature]();
             }
         }

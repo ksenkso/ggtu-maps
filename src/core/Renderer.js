@@ -51,6 +51,9 @@ export default class Renderer extends EventEmitter {
         this.sprites = [new Sprite(), new Sprite(), new Sprite(), new Sprite(), ...Array(16 + 64).fill(null)];
         this.placeSprites(0, 2);
         // set default values
+        options.drag = options.drag !== undefined ? options.drag : {};
+        options.pinch = options.pinch !== undefined ? options.pinch : {};
+        options.wheel = options.wheel !== undefined ? options.wheel : {};
         options.clamp = options.clamp !== undefined ? options.clamp : {
             direction: 'all'
         };
@@ -59,13 +62,13 @@ export default class Renderer extends EventEmitter {
             maxHeight: WORLD_SIZE
         };
         console.log(options);
+        if (!options.clampZoom) {
+
+        }
         for (const feature of ['drag', 'pinch', 'wheel', 'clamp', 'clampZoom']) {
             if (options[feature]) {
                 console.log(`${feature} with options: ${JSON.stringify(options[feature])}`);
                 this._viewport[feature](options[feature])
-            } else {
-                console.log(`${feature} without options`);
-                this._viewport[feature]();
             }
         }
         // this._viewport

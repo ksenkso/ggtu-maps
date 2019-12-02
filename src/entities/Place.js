@@ -1,8 +1,10 @@
+import MapObject from "../rendering/MapObject";
 /**
  * @class Place
  */
-class Place {
-    constructor({name, type, LocationId = null, id = null, coordinates = []}) {
+class Place extends MapObject {
+    constructor({name, type, LocationId = null, id = null, coordinates = [], MapObject = {}}) {
+        super(MapObject);
         this.name = name;
         this.type = type;
         this.LocationId = LocationId;

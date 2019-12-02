@@ -32,6 +32,13 @@ import EventEmitter from './EventEmitter';
 import Renderer from './Renderer';
 
 export default class Map extends EventEmitter {
+    /**
+     *
+     * @type {PIXIOptions}
+     */
+    static defaultOptions = {
+        backgroundColor: 0xffffff
+    };
 
     get isLoading() {
         return this._isLoadingStartLocation || this._renderer.mapLoader.loading;
@@ -45,7 +52,7 @@ export default class Map extends EventEmitter {
         super();
         this.root = options.root;
         // 1. init a PIXI app, get ready to load a location,
-        this.app = new PIXI.Application(options.app || {});
+        this.app = new PIXI.Application(Object.assign({}, Map.defaultOptions, options.app));
         this.root.appendChild(this.app.view);
         // 2. to do that, create an API instance or take it from options
         if (options.api.instance) {
@@ -95,7 +102,19 @@ export default class Map extends EventEmitter {
         return this._currentLocation;
     }
 
-    getCoords() {}
+    /**
+     *
+     * @param {MapObject} mapObject
+     */
+    draw(mapObject) {
+        this._renderer.drawObject(mapObject);
+    }
 
-    getZoom() {}
+    /**
+     *
+     * @param {object} style
+     */
+    setDrawingStyle(style) {
+
+    }
 }

@@ -1,17 +1,59 @@
 /**
+ *@typedef {{
+ *   left?: boolean | number
+ *   right?: boolean | number
+ *   top?: boolean | number
+ *   bottom?: boolean | number
+ *   direction?: 'all' | 'x' | 'y'
+ *   underflow?: 'center' | 'top' | 'left' | 'right' | 'bottom' | string
+ *}} ClampOptions
+ *
+ *
+ * @typedef {{
+ *   direction?: 'all' | 'x' | 'y'
+ *   wheel?: boolean
+ *   wheelScroll?: number
+ *   reverse?: boolean
+ *   clampWheel?: boolean | string
+ *   underflow?: string
+ *   factor?: number
+ *   mouseButtons?: 'all' | 'left' | 'middle' | 'right' | string
+ * }} DragOptions
+ *
+ * @typedef {{
+ *   minWidth?: number
+ *   minHeight?: number
+ *   maxWidth?: number
+ *   maxHeight?: number
+ * }} ClampZoomOptions
+ *
+ * @typedef {{
+ *   percent?: number
+ *   reverse?: boolean
+ *   center?: PIXI.Point
+ *   smooth?: number
+ * }} WheelOptions
+ *
+ * @typedef {{
+ *   percent?: number
+ *   noDrag?: boolean
+ *   center?: PIXI.Point
+ * }} PinchOptions
+ *
+ *
  * @typedef {{
  * map: Map,
  * clamp?: ClampOptions,
  * drag?: DragOptions,
  * clampZoom?: ClampZoomOptions,
  * wheel?: WheelOptions,
- * pinch?: PinchOption
+ * pinch?: PinchOptions
  * }} RendererOptions
  */
 import ApiClient from '../api/ApiClient';
 import EventEmitter from './EventEmitter';
 import {Viewport} from 'pixi-viewport';
-import {Loader, Sprite} from 'pixi.js';
+import {Loader, Sprite, Graphics} from 'pixi.js';
 
 const WORLD_SIZE = 512;
 
@@ -309,4 +351,32 @@ export default class Renderer extends EventEmitter {
             }
         }
     }
+
+    /**
+     *
+     * @throws Error
+     * @param {MapObject} mapObject
+     */
+    draw(mapObject) {
+        this.setDrawingStyle(mapObject.constructor.style);
+        // if there is already a graphics instance, use it
+        // if not, create one
+        if (!mapObject.graphics) {
+            mapObject.graphics = new Graphics();
+        }
+        if (mapObject.coordinates && mapObject.coordinates.length > 5) {
+            mapObject.graphics.drawPolygon(mapObject.coordinates);
+        } else {
+            throw new Error('Cannot draw a polygon: too few points. Given: ' + JSON.stringify(mapObject.coordinates));
+        }
+    }
+
+    /**
+     *
+     * @param {object} style
+     */
+    setDrawingStyle(style) {
+
+    }
+
 }
